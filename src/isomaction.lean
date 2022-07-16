@@ -35,12 +35,58 @@ begin
 end
 
 def isom_img {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
-[isom_action α β] (g: α) (s : set β) :=
+[isom_action α β] (g : α) (s : set β) :=
 (λ x : β , g•x) '' s
 --{x : β | ∃ y : β, y ∈ s ∧ g•y = x}
 
 -- das hätte ich gerne mit • notation
 
+theorem isom_img_inv {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
+[isom_action α β] (g : α) (s : set β) (x : β) (hx : x ∈ isom_img g s ) : g⁻¹ • x ∈ s :=
+begin
+rcases hx with ⟨ z, ⟨ zs, hz⟩ ⟩, dsimp at hz,
+rw ← hz,
+simp,
+exact zs,
+end
+
+theorem isom_img_self {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
+[isom_action α β] (g : α) (s : set β) {x : β} (hx : x ∈ s) : g • x ∈ isom_img g s :=
+begin
+use x,
+split,
+exact hx,
+simp,
+end
+
+
+theorem isom_img_one {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
+[isom_action α β] (g : α) (s : set β) (x : β) : s = isom_img (1:α) s :=
+begin
+apply subset_antisymm,
+intros x hx,
+use x,
+split,
+exact hx,
+simp,
+intros y hy,
+rcases hy with ⟨z, ⟨hz1, hz2 ⟩⟩,
+dsimp at hz2,
+rw ← hz2,simp,
+exact hz1,
+end
+
+theorem isom_img_mul {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
+[isom_action α β] (g: α) (s : set β) (x : β) (hx : x ∈ isom_img g s ) (h : α): h • x ∈ isom_img (h*g) s  :=
+begin
+rcases hx with ⟨ z, ⟨ zs, hz⟩ ⟩, dsimp at hz,
+rw ← hz,
+use z,
+split, 
+exact zs,
+dsimp,
+rw smul_smul,
+end
 
 lemma diam_preserved {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
 [isom_action α β] (s : set β) (g : α) : diam (isom_img g s) = diam s :=
@@ -111,12 +157,27 @@ begin
 end
 
 
-def proper_action_set {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
+def proper_action_set (α : Type*) {β : Type*} [monoid α] [pseudo_metric_space β] 
   [isom_action α β] (s : set β) : set α := 
    {g : α | s ∩ (isom_img g s) ≠ ∅}
 
-def translates_cover {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
+def translates_cover (α : Type*) {β : Type*} [monoid α] [pseudo_metric_space β] 
   [isom_action α β] (s : set β) : Prop :=
   ∀ x : β, x ∈ (⋃ g : α, isom_img g s)
+
+theorem exists_cover_element {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
+  [isom_action α β] {s : set β} (h : translates_cover α s) (x : β) : ∃ g : α, x ∈ isom_img g s  :=
+  begin
+  have hx : x ∈ (⋃ g : α, isom_img g s),
+    apply h,
+  rw set.mem_Union at hx,
+  cases hx with i hi,
+  use i, exact hi,
+  end
+
+  noncomputable def cover_element {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
+  [isom_action α β] {s : set β} (h : translates_cover α s) (x : β) : α :=
+  classical.some (exists_cover_element h x)
+
 
 

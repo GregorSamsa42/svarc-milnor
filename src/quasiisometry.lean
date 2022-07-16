@@ -23,26 +23,26 @@ quasi-isometry if and only if it has quasi-dense image.
 
 -- quasi-isometric embeddings
 def is_QIE_lower
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c b : ℝ)
 := ∀ x x' : X, dist (f x) (f x') ≥ 1/c * dist x x' - b    
 
 def is_QIE_upper
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c b : ℝ)
 := ∀ x x' : X, dist (f x) (f x') ≤ c * dist x x' + b    
 
 def is_QIE' 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c b : ℝ)
 := is_QIE_upper f c b 
  ∧ is_QIE_lower f c b 
 
 def is_QIE 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
 := ∃ c : ℝ, ∃ b : ℝ,
    c > 0 
@@ -52,20 +52,20 @@ def is_QIE
 
 -- finite distance
 def has_fin_dist' 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f g : X → Y)
     (c : ℝ)
 := ∀ x : X, dist (f x) (g x) ≤ c    
 
 def has_fin_dist 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f g : X → Y)
 := ∃ c : ℝ, 
    c > 0
  ∧ has_fin_dist' f g c
 
 def are_quasi_inverse 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (g : Y → X)
 := has_fin_dist (g ∘ f) id
@@ -73,7 +73,7 @@ def are_quasi_inverse
 
 -- quasi-isometry
 def is_QI 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
 := is_QIE f
  ∧ ∃ g : Y → X, is_QIE g 
@@ -85,7 +85,7 @@ def is_QI
 
 -- rewriting the lower estimate for quasi-isometric embeddings
 lemma QIE_lower_est 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c b : ℝ)
     (c_pos : c > 0)
@@ -116,7 +116,7 @@ end
 -- Sometimes, it is convenient to be able to use 
 -- different constants for the upper/lower estimates
 lemma QIE_from_different_constants
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c1 b1 c2 b2: ℝ)
     (c1_pos : c1 > 0)
@@ -200,13 +200,13 @@ end
 -- We show the two implications separately: 
 
 def has_quasidense_image'
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
     (c : ℝ)
 := ∀ y : Y, ∃ x : X, dist (f x) y ≤ c    
 
 def has_quasidense_image 
-    {X Y : Type*} [metric_space X] [metric_space Y]
+    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
     (f : X → Y)
 := ∃ c : ℝ, 
    c > 0 
@@ -214,7 +214,7 @@ def has_quasidense_image
 
 -- Quasi-isometries have quasi-dense image:
 theorem QI_has_quasidense_image
-     {X Y : Type*} [metric_space X] [metric_space Y]
+     {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
      (f : X → Y)
      (f_is_QI : is_QI f)
    : has_quasidense_image f 
@@ -253,7 +253,7 @@ end
 -- Quasi-inverses of quasi-isometric embeddings 
 -- are quasi-isometric embeddings
 lemma quasiinverse_of_QIE_is_QIE 
-     {X Y : Type*} [metric_space X] [metric_space Y]
+     {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
      (f : X → Y)
      (g : Y → X)
      (f_is_QIE : is_QIE f)
@@ -376,7 +376,7 @@ begin
 end
 
 theorem QIE_with_quasidense_image_is_QI 
-     {X Y : Type*} [metric_space X] [metric_space Y]
+     {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
      (f : X → Y)
      (f_is_QIE : is_QIE f)
      (f_qdense_im : has_quasidense_image f)
