@@ -36,9 +36,9 @@ variables {α : Type*} {β : Type*} [inhabited β] [group α] [inhabited α]
 
 
 lemma intS  (c : ℝ) (b : ℝ) (cpos: c > 0) (bnonneg: b ≥ 0)  [quasigeodesic_space β c b cpos bnonneg] 
-  [isom_action α β] (s : set β) (finitediam : metric.bounded s) (g : α) (h : α) (x : β) (y : β) (hx: x ∈ isom_img g s)
+  [isom_action α β] (s : set β) (g : α) (h : α) (x : β) (y : β) (hx: x ∈ isom_img g s)
   (hy : y ∈ isom_img h s) (hd : dist x y ≤ 2*b) 
-  : ∃ t ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))), g*t = h
+  : ∃ t ∈ (proper_action_set α (set_closed_ball s (2*b))), g*t = h
    := 
 begin
 use g⁻¹*h,
@@ -67,42 +67,105 @@ exact g, exact x,
 simp,
 end
 
-namespace list
-
-theorem subdiv {L : ℝ} (Lnonneg : L ≥ 0) {d : ℝ} (dpos : d > 0)
- : ∃ l : list ℝ, l.head = 0 ∧ (l.reverse).head = L ∧ (∀ i : ℕ, (l.inth i)-(l.inth (i-1)) ≤ d ∧ l.inth i ≥ 0 ∧ l.inth i ≤ L) :=
+lemma intS'  (c : ℝ) (b : ℝ) (cpos: c > 0) (bnonneg: b ≥ 0)  [quasigeodesic_space β c b cpos bnonneg] 
+  [isom_action α β] (s : set β) (g : α) (h : α) (x : β) (y : β) (hx: x ∈ isom_img g s)
+  (hy : y ∈ isom_img h s) (hd : dist x y ≤ 2*b) 
+  : g⁻¹ * h ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))) :=
 begin
-sorry
+  have h : ∃ t ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))), g*t = h,
+    apply intS c b cpos bnonneg s g h x y hx hy hd,
+  rcases h with ⟨t, ⟨ht1, ht2⟩ ⟩,
+  have hi : t = g⁻¹ * h,
+    rw ← ht2, simp,
+  rw ← hi,
+  exact ht1,
 end
 
-def right_inv_list (g : α) : list α → list α
-| nil := [g]
-| (cons a l) :=  (g* a⁻¹) :: ((a*(l.head)) :: (erasep (λ x, true) (right_inv_list l)))
+-- namespace list
+
+-- theorem subdiv {L : ℝ} (Lnonneg : L ≥ 0) {d : ℝ} (dpos : d > 0)
+--  : ∃ l : list ℝ, l.head = 0 ∧ (l.reverse).head = L ∧ (∀ i : ℕ, (l.inth i)-(l.inth (i-1)) ≤ d ∧ l.inth i ≥ 0 ∧ l.inth i ≤ L) :=
+-- begin
+-- sorry
+-- end
+
+-- def right_inv_list (g : α) : list α → list α
+-- | nil := [g]
+-- | (cons a l) :=  (g* a⁻¹) :: ((a*(l.head)) :: (erasep (λ x, true) (right_inv_list l)))
 
 
-lemma prod_of_inv (g : α) (l : list α) : g = list.prod (right_inv_list g l) :=
-begin
+-- lemma prod_of_inv (g : α) (l : list α) : g = list.prod (right_inv_list g l) :=
+-- begin
+-- sorry
+-- end
+
+lemma closure_mul (g' : α) (K : set α) (hg : g' ∈ subgroup.closure K)(g : α) : (∃ k ∈ K, g'*k = g) → g ∈ subgroup.closure K :=
 sorry
+
+lemma sm_aux (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
+  [isom_action α β] (s : set β) (htrans: translates_cover α s) (f : ℝ → β) (x : β) (xs : x ∈ s) (n : ℕ)
+   : ∀ g : α, ∀ L : ℝ, ∀ Lnonneg : L ≥ 0, ∀ hL' : L ≤ (n : ℝ)*b/c, ((∃ y ∈ isom_img g s, quasigeodesic L Lnonneg f x y c b) → g ∈ subgroup.closure (proper_action_set α (set_closed_ball s (2*b)))) :=
+begin
+-- have harch : ∃ n : ℕ, L ≤ (n : real)*b/c,
+-- --apply real.archimedean.arch,
+--   sorry,
+-- cases harch with n hn,
+induction n with d hd,
+rintros g L Lnonneg hL ⟨ y, ⟨hy, qg⟩⟩,
+simp at hL,
+have Lzero : L = 0, by apply le_antisymm hL Lnonneg,
+have gfix : y = x,
+  apply degenerate_quasigeodesic f y x c b,
+  -- rw Lzero at qg,
+  sorry,
+apply subgroup.subset_closure,
+sorry,
+let L' := (d : real)*b/c,
+have L'nonneg : L' ≥ 0,
+  {sorry},
+rintros g L Lnonneg hL ⟨y, ⟨hy, qg⟩⟩,
+have hL' : L' ≤ L,
+  {sorry},
+have hq : quasigeodesic L' L'nonneg f x (f L') c b, from trunc_quasigeodesic L Lnonneg f x y c b hL' L'nonneg qg,
+simp at *,
+have L'cov : ∃ g' : α, (f L') ∈ isom_img g' s, from exists_cover_element htrans (f L'),
+cases L'cov with g' hg',
+have g'_mem_closure : g' ∈ subgroup.closure (proper_action_set α (set_closed_ball s (2 * b))),
+  from hd g' L' L'nonneg le_rfl (f L') hg' hq,
+have smalldist : dist (f L') (f L) ≤ 2*b,
+  {sorry,},
+apply closure_mul g' (proper_action_set α (set_closed_ball s (2 * b))) g'_mem_closure g,
+apply intS c b cpos (le_of_lt bpos) s g' g (f L') (f L) hg' _ smalldist,
+rw qg.2.1,
+exact hy,
 end
 
 theorem metric_svarcmilnor1  (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
   [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
-   : α = subgroup.closure (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))) :=
+   : α = subgroup.closure (proper_action_set α (set_closed_ball s (2*b))) :=
 begin
+
 rw generates_iff_subset,
 intro g,
--- rw mem_closure_iff_finite_prod,
-let x : β, exact default,
-have h : conn_by_quasigeodesic' x (g • x) c b,
-  apply quasigeodesic_space.quasigeodesics x (g • x),
-rcases h with ⟨ L, Lpos, f, qif⟩,
+let x' : β, exact default,
+have snonempty: ∃ x, x ∈ s,
+  sorry,
+let x := classical.some snonempty,
+have xs : x ∈ s, from classical.some_spec snonempty,
+-- have imgnonempty: ∃ x, x ∈ isom_img g s,
+--   use g • x,
+--   apply isom_img_self,
+--   apply classical.some_spec snonempty,
+-- let y := classical.some imgnonempty,
+have h : conn_by_quasigeodesic' x (g • x) c b, by apply quasigeodesic_space.quasigeodesics x (g • x),
+rcases h with ⟨ L, Lnonneg, f, qif⟩,
 have harch : ∃ n : ℕ, L ≤ (n : real)*b/c,
 --apply real.archimedean.arch,
-  {sorry},
+  sorry,
 cases harch with n hn,
-induction n with d hd,
-
-
+apply sm_aux c b cpos bpos s htrans f x xs n g L Lnonneg hn,
+use g • x,
+exact ⟨isom_img_self g s xs, qif⟩,
 
 -- -- tlist is subdivision of [O,L] with distances smaller than b/c
 
