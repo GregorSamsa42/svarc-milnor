@@ -47,7 +47,6 @@ have hy' : y ∈ set_closed_ball (isom_img g s) (2*b),
   {use x, split, exact hx, rw dist_comm, exact hd,},
 rw ← isom_of_set_closed_ball at hy',
 have hy'' : y ∈ isom_img h (set_closed_ball s (2*b)),
--- rcases hx with ⟨ z, ⟨ zs, hz ⟩⟩, dsimp at hz,
 rcases hy with ⟨ w, ⟨ ws, hw ⟩⟩, dsimp at hw,
 use w, 
 split,
@@ -63,23 +62,22 @@ apply set.nonempty.ne_empty,
 rw set.nonempty_def,
 use g⁻¹ • y,
 exact ⟨i1, i2⟩,
-exact g, exact x,
 simp,
 end
 
-lemma intS'  (c : ℝ) (b : ℝ) (cpos: c > 0) (bnonneg: b ≥ 0)  [quasigeodesic_space β c b cpos bnonneg] 
-  [isom_action α β] (s : set β) (g : α) (h : α) (x : β) (y : β) (hx: x ∈ isom_img g s)
-  (hy : y ∈ isom_img h s) (hd : dist x y ≤ 2*b) 
-  : g⁻¹ * h ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))) :=
-begin
-  have h : ∃ t ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))), g*t = h,
-    apply intS c b cpos bnonneg s g h x y hx hy hd,
-  rcases h with ⟨t, ⟨ht1, ht2⟩ ⟩,
-  have hi : t = g⁻¹ * h,
-    rw ← ht2, simp,
-  rw ← hi,
-  exact ht1,
-end
+-- lemma intS'  (c : ℝ) (b : ℝ) (cpos: c > 0) (bnonneg: b ≥ 0)  [quasigeodesic_space β c b cpos bnonneg] 
+--   [isom_action α β] (s : set β) (g : α) (h : α) (x : β) (y : β) (hx: x ∈ isom_img g s)
+--   (hy : y ∈ isom_img h s) (hd : dist x y ≤ 2*b) 
+--   : g⁻¹ * h ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))) :=
+-- begin
+--   have h : ∃ t ∈ (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))), g*t = h,
+--     apply intS c b cpos bnonneg s g h x y hx hy hd,
+--   rcases h with ⟨t, ⟨ht1, ht2⟩ ⟩,
+--   have hi : t = g⁻¹ * h,
+--     rw ← ht2, simp,
+--   rw ← hi,
+--   exact ht1,
+-- end
 
 -- namespace list
 
@@ -104,7 +102,7 @@ sorry
 
 lemma sm_aux (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
   [isom_action α β] (s : set β) (htrans: translates_cover α s) (f : ℝ → β) (x : β) (xs : x ∈ s) (n : ℕ)
-   : ∀ g : α, ∀ L : ℝ, ∀ Lnonneg : L ≥ 0, ∀ hL' : L ≤ (n : ℝ)*b/c, ((∃ y ∈ isom_img g s, quasigeodesic L Lnonneg f x y c b) → g ∈ subgroup.closure (proper_action_set α (set_closed_ball s (2*b)))) :=
+   : ∀ (g : α) (L : ℝ) (Lnonneg : L ≥ 0) (hL' : L ≤ (n : ℝ)*(b/c)), ((∃ y ∈ isom_img g s, quasigeodesic L Lnonneg f x y c b) → g ∈ subgroup.closure (proper_action_set α (set_closed_ball s (2*b)))) :=
 begin
 -- have harch : ∃ n : ℕ, L ≤ (n : real)*b/c,
 -- --apply real.archimedean.arch,
@@ -119,12 +117,23 @@ have gfix : y = x,
   -- rw Lzero at qg,
   sorry,
 apply subgroup.subset_closure,
-sorry,
-let L' := (d : real)*b/c,
+rw @isom_img_one α β _ _ _ s at xs,
+have dzero : dist x y ≤ 2*b, 
+  begin
+    rw gfix,
+    rw dist_self x,
+    apply mul_nonneg,
+    linarith,
+    exact le_of_lt bpos,
+  end,
+have hg : ∃ (t : α) (H : t ∈ proper_action_set α (set_closed_ball s (2 * b))), 1 * t = g, from intS c b cpos (le_of_lt bpos) s 1 g x y xs hy dzero,
+simp at hg,
+exact hg,
+let L' := (d : real)*(b/c),
 have L'nonneg : L' ≥ 0,
-  {sorry},
+  { apply mul_nonneg, simp, apply (le_of_lt (div_pos bpos cpos)), },
 rintros g L Lnonneg hL ⟨y, ⟨hy, qg⟩⟩,
-have hL' : L' ≤ L,
+have hL' : L' ≤ L, 
   {sorry},
 have hq : quasigeodesic L' L'nonneg f x (f L') c b, from trunc_quasigeodesic L Lnonneg f x y c b hL' L'nonneg qg,
 simp at *,
@@ -144,28 +153,28 @@ theorem metric_svarcmilnor1  (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [q
   [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
    : α = subgroup.closure (proper_action_set α (set_closed_ball s (2*b))) :=
 begin
+  rw generates_iff_subset,
+  intro g,
+  let x' : β, exact default,
+  have snonempty: ∃ x, x ∈ s,
 
-rw generates_iff_subset,
-intro g,
-let x' : β, exact default,
-have snonempty: ∃ x, x ∈ s,
-  sorry,
-let x := classical.some snonempty,
-have xs : x ∈ s, from classical.some_spec snonempty,
--- have imgnonempty: ∃ x, x ∈ isom_img g s,
---   use g • x,
---   apply isom_img_self,
---   apply classical.some_spec snonempty,
--- let y := classical.some imgnonempty,
-have h : conn_by_quasigeodesic' x (g • x) c b, by apply quasigeodesic_space.quasigeodesics x (g • x),
-rcases h with ⟨ L, Lnonneg, f, qif⟩,
-have harch : ∃ n : ℕ, L ≤ (n : real)*b/c,
---apply real.archimedean.arch,
-  sorry,
-cases harch with n hn,
-apply sm_aux c b cpos bpos s htrans f x xs n g L Lnonneg hn,
-use g • x,
-exact ⟨isom_img_self g s xs, qif⟩,
+    sorry,
+  let x := classical.some snonempty,
+  have xs : x ∈ s, from classical.some_spec snonempty,
+  -- have imgnonempty: ∃ x, x ∈ isom_img g s,
+  --   use g • x,
+  --   apply isom_img_self,
+  --   apply classical.some_spec snonempty,
+  -- let y := classical.some imgnonempty,
+  have h : conn_by_quasigeodesic' x (g • x) c b, by apply quasigeodesic_space.quasigeodesics x (g • x),
+  rcases h with ⟨ L, Lnonneg, f, qif⟩,
+  have harch : ∃ n : ℕ, L ≤ (n : real)*(b/c),
+  --  apply archimedean.arch L (div_pos bpos cpos),
+    sorry,
+  cases harch with n hn,
+  apply sm_aux c b cpos bpos s htrans f x xs n g L Lnonneg hn,
+  use g • x,
+  exact ⟨isom_img_self g s xs, qif⟩,
 
 -- -- tlist is subdivision of [O,L] with distances smaller than b/c
 

@@ -61,7 +61,7 @@ end
 
 
 theorem isom_img_one {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
-[isom_action α β] (g : α) (s : set β) (x : β) : s = isom_img (1:α) s :=
+[isom_action α β] (s : set β) : s = isom_img (1:α) s :=
 begin
 apply subset_antisymm,
 intros x hx,
