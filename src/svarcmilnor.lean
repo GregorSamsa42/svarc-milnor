@@ -133,8 +133,14 @@ let L' := (d : real)*(b/c),
 have L'nonneg : L' ≥ 0,
   { apply mul_nonneg, simp, apply (le_of_lt (div_pos bpos cpos)), },
 rintros g L Lnonneg hL ⟨y, ⟨hy, qg⟩⟩,
+by_cases L ≤ d*(b/c),
+  apply hd g L Lnonneg h,
+  use y,
+  exact ⟨hy, qg⟩,
 have hL' : L' ≤ L, 
-  {sorry},
+  apply le_of_lt,
+  apply lt_of_not_ge,
+  exact h,
 have hq : quasigeodesic L' L'nonneg f x (f L') c b, from trunc_quasigeodesic L Lnonneg f x y c b hL' L'nonneg qg,
 simp at *,
 have L'cov : ∃ g' : α, (f L') ∈ isom_img g' s, from exists_cover_element htrans (f L'),
@@ -156,8 +162,8 @@ begin
   rw generates_iff_subset,
   intro g,
   let x' : β, exact default,
+  let a := cover_element htrans x',
   have snonempty: ∃ x, x ∈ s,
-
     sorry,
   let x := classical.some snonempty,
   have xs : x ∈ s, from classical.some_spec snonempty,
@@ -194,11 +200,33 @@ begin
 
 end
 
+open metric 
+
+lemma svarcmilnor_qdense (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
+  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β) (xs : x ∈ s)
+   : has_quasidense_image (λ g : α, g • x) :=
+begin
+  cases finitediam with k hk,
+  have knonneg : k ≥ 0,
+    rw ← dist_self x,
+    apply hk x xs x xs,
+  use (k+1),
+  split,
+  { linarith, },
+  intro y,
+  have h : ∃ g : α, y ∈ isom_img g s, from exists_cover_element htrans y,
+  rcases h with ⟨g, ⟨z, hz⟩ ⟩,
+  use g,
+  dsimp at *,
+  rw ← hz.2,
+  rw ← dist_of_isom,
+  have dxz : dist x z ≤ k, from hk x xs z hz.1,
+  linarith,
+end
+
+
 theorem metric_svarcmilnor2 (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β] (s : set β) (htrans: @translates_cover α β _ _ _ s) (finitediam : metric.bounded s)
-   : ∀ x : β, @is_QI α β (word_metric (@proper_action_set α _ _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b s htrans finitediam)) _ (λ g : α, g • x) :=
-   begin
-   sorry
-   end
+  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
+   : ∀ x : β, @is_QI α β (word_metric (proper_action_set α (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
 
 

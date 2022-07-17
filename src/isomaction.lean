@@ -157,7 +157,7 @@ begin
 end
 
 
-def proper_action_set (α : Type*) {β : Type*} [monoid α] [pseudo_metric_space β] 
+def proper_action_set (α : Type*) {β : Type*} [group α] [pseudo_metric_space β] 
   [isom_action α β] (s : set β) : set α := 
    {g : α | s ∩ (isom_img g s) ≠ ∅}
 

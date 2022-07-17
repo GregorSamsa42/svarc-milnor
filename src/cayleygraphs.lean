@@ -26,12 +26,7 @@ noncomputable def cayley_dist {G : Type*} [group G] (S: set G) (hS: G = subgroup
 
 theorem mem_closure_iff_finite_prod {G : Type*} [group G]
  (S: set G) : ∀ x : G, (x ∈ subgroup.closure S ↔ ∃ l : list G, ((∀ x : G, x ∈ l → (x ∈ S ∨ x⁻¹ ∈ S) → list.prod l = x))):=
-begin
-intro x,
-split,
-intro hx,
 sorry
-end
 
 theorem generates_iff_subset {G: Type*} [group G] (S : set G) : G = subgroup.closure S ↔ ∀ x : G, x ∈ subgroup.closure S :=
 begin
@@ -74,7 +69,7 @@ simp,
 unfold cayley_dist,
 intros x y z,
 simp [coe, lift_t], 
-apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS),
+ -- apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS),
 sorry
 end
 }

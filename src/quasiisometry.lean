@@ -17,6 +17,9 @@ We then prove that a quasi-isometric embedding is a
 quasi-isometry if and only if it has quasi-dense image.
 -/
 
+-- Changes by Georgi Kocharyan: Defined on pseudometric spaces, QI-dense definition doesn't
+-- require X to be a metric space
+
 /-
 # Quasi-isometric embeddings and quasi-isometries
 -/
@@ -200,13 +203,13 @@ end
 -- We show the two implications separately: 
 
 def has_quasidense_image'
-    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
+    {X Y : Type*} [pseudo_metric_space Y]
     (f : X → Y)
     (c : ℝ)
 := ∀ y : Y, ∃ x : X, dist (f x) y ≤ c    
 
 def has_quasidense_image 
-    {X Y : Type*} [pseudo_metric_space X] [pseudo_metric_space Y]
+    {X Y : Type*} [pseudo_metric_space Y]
     (f : X → Y)
 := ∃ c : ℝ, 
    c > 0 
