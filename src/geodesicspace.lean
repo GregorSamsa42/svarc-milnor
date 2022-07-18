@@ -21,7 +21,7 @@ class geodesic_space (β : Type*)  extends pseudo_metric_space β :=
 
 def quasigeodesic {X : Type*} [pseudo_metric_space X] (L : ℝ) (Lnonneg : L ≥ 0) (f: ℝ → X)
  (x : X) (y: X) (c : ℝ) (b : ℝ) :=
- f 0 = x ∧ f L = y ∧ (∀ a b ∈ {x : ℝ| 0 ≤ x ∧ x ≤ L}, (1/c)*(abs (a-b)) - b ≤ dist (f a) (f b) ∧ dist (f a) (f b) ≤ c * (abs (a-b)) + b)
+ f 0 = x ∧ f L = y ∧ (∀ m n  ∈ {x : ℝ| 0 ≤ x ∧ x ≤ L}, (1/c)*(abs (m-n)) - b ≤ dist (f m) (f n) ∧ dist (f m) (f n) ≤ c * (abs (m-n)) + b)
 
 -- any segment of a quasigeodesic is also a quasigeodesic
 

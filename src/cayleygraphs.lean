@@ -68,8 +68,8 @@ dist_triangle := begin
 simp,
 unfold cayley_dist,
 intros x y z,
-simp [coe, lift_t], 
- -- apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS),
+-- simp [coe, lift_t], 
+-- apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS),
 sorry
 end
 }

@@ -147,10 +147,22 @@ have L'cov : ∃ g' : α, (f L') ∈ isom_img g' s, from exists_cover_element ht
 cases L'cov with g' hg',
 have g'_mem_closure : g' ∈ subgroup.closure (proper_action_set α (set_closed_ball s (2 * b))),
   from hd g' L' L'nonneg le_rfl (f L') hg' hq,
-have smalldist : dist (f L') (f L) ≤ 2*b,
-  {sorry,},
+have smalldistdom : abs (L' - L) ≤ b/c,
+{ rw abs_sub_comm,
+  rw abs_of_nonneg,
+  simp,
+  rw ← one_mul (b/c),
+  rw ← add_mul,
+  rwa add_comm,
+  linarith, },
+have smalldistimg : dist (f L') (f L) ≤ 2*b,
+  calc
+    dist (f L') (f L) ≤ c * abs(L' - L) + b : begin exact (qg.2.2 L' ⟨L'nonneg, hL'⟩ L ⟨Lnonneg, le_rfl⟩).2, end
+    ...               ≤ c * (b/c) + b : begin exact add_le_add (mul_le_mul_of_nonneg_left smalldistdom (le_of_lt cpos)) (le_rfl), end
+    ...               = b + b : by sorry
+    ...               = 2*b : by linarith, 
 apply closure_mul g' (proper_action_set α (set_closed_ball s (2 * b))) g'_mem_closure g,
-apply intS c b cpos (le_of_lt bpos) s g' g (f L') (f L) hg' _ smalldist,
+apply intS c b cpos (le_of_lt bpos) s g' g (f L') (f L) hg' _ smalldistimg,
 rw qg.2.1,
 exact hy,
 end
@@ -224,9 +236,37 @@ begin
   linarith,
 end
 
+lemma proper_action_set_bound (b : ℝ) [pseudo_metric_space β] [isom_action α β] (s : set β) (finitediam : metric.bounded s)
+  (x : β) (xs : x ∈ s)
+  : ∃ k : ℝ, ∀ t ∈ proper_action_set α (set_closed_ball s (2*b)), dist x (t • x) ≤ k :=
+  begin
+  cases finitediam with k hk,
+  use 2*(k+2*b),
+  intros t ht,
+  have h : ∃ y : β, y ∈ set_closed_ball s (2*b) ∩ (isom_img t (set_closed_ball s (2*b))),
+    rw ← set.nonempty_def,
+    rw ← set.ne_empty_iff_nonempty,
+    exact ht,
+  rcases h with ⟨y, ⟨⟨z, ⟨zs, hz⟩⟩, ⟨a, ⟨⟨m, ⟨ms, hm⟩⟩, ha⟩⟩⟩ ⟩,
+  have dxy : dist x y ≤ k + 2*b,
+  { apply le_trans (dist_triangle x z y),
+    apply add_le_add (hk x xs z zs),
+    rwa dist_comm, },
+  dsimp at ha,
+  have dyt : dist y (t • x) ≤ k + 2*b,
+    rw ← ha,
+    rw ← dist_of_isom,
+  { apply le_trans (dist_triangle a m x),
+    rw add_comm,
+    apply add_le_add (hk m ms x xs),
+    exact hm, },
+  apply le_trans (dist_triangle x y (t • x)),
+  linarith,
+  end
+
+
 
 theorem metric_svarcmilnor2 (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
-   : ∀ x : β, @is_QI α β (word_metric (proper_action_set α (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
-
-
+  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β)
+   : @is_QI α β (@word_metric α _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
+   sorry
