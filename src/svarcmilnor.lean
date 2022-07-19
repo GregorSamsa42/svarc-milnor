@@ -159,7 +159,7 @@ have smalldistimg : dist (f L') (f L) ≤ 2*b,
   calc
     dist (f L') (f L) ≤ c * abs(L' - L) + b : begin exact (qg.2.2 L' ⟨L'nonneg, hL'⟩ L ⟨Lnonneg, le_rfl⟩).2, end
     ...               ≤ c * (b/c) + b : begin exact add_le_add (mul_le_mul_of_nonneg_left smalldistdom (le_of_lt cpos)) (le_rfl), end
-    ...               = b + b : by sorry
+    ...               = b + b : by 
     ...               = 2*b : by linarith, 
 apply closure_mul g' (proper_action_set α (set_closed_ball s (2 * b))) g'_mem_closure g,
 apply intS c b cpos (le_of_lt bpos) s g' g (f L') (f L) hg' _ smalldistimg,
