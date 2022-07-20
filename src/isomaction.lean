@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2022 Georgi Kocharyan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.txt.
+Author: Georgi Kocharyan.
+-/
+
 import tactic
 import data.real.basic 
 import topology.metric_space.isometry
@@ -25,13 +31,23 @@ lemma isom_of_isom_action {α : Type*} {β : Type*} [monoid α] [pseudo_metric_s
 ∀ g : α, isometry (λ x : β , g•x)
 := isom_action.isom
 
-lemma dist_of_isom (α : Type*) (β : Type*) [monoid α] [pseudo_metric_space β] 
-[isom_action α β] : ∀ g : α, ∀ x y : β, dist x y = dist (g • x) (g • y) :=
+lemma dist_of_isom {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 
+[isom_action α β] (g : α) (x y : β) : dist x y = dist (g • x) (g • y) :=
 begin
-  intros g x y,
   apply eq.symm,
   apply isometry.dist_eq,
   exact isom_of_isom_action g,
+end
+
+lemma dist_of_inv_isom (α : Type*) (β : Type*) [group α] [pseudo_metric_space β] 
+[isom_action α β] (g h : α) (x y : β) : dist (g • x) (h • y) = dist (x) ((g⁻¹*h) • y) :=
+begin
+  have k : dist (g • x) (h • y) = dist ((g⁻¹*g) • x) ((g⁻¹ * h) • y),
+  repeat {rw ← smul_smul,},
+  rw ← dist_of_isom (g⁻¹),
+  rw k,
+  simp,
+  rw smul_smul,
 end
 
 def isom_img {α : Type*} {β : Type*} [monoid α] [pseudo_metric_space β] 

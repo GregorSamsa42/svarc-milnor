@@ -1,3 +1,10 @@
+
+/-
+Copyright (c) 2022 Georgi Kocharyan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.txt.
+Author: Georgi Kocharyan.
+-/
+
 import .isomaction
 import .quasiisometry
 import .geodesicspace
@@ -159,7 +166,7 @@ have smalldistimg : dist (f L') (f L) ≤ 2*b,
   calc
     dist (f L') (f L) ≤ c * abs(L' - L) + b : begin exact (qg.2.2 L' ⟨L'nonneg, hL'⟩ L ⟨Lnonneg, le_rfl⟩).2, end
     ...               ≤ c * (b/c) + b : begin exact add_le_add (mul_le_mul_of_nonneg_left smalldistdom (le_of_lt cpos)) (le_rfl), end
-    ...               = b + b : by 
+    ...               = b + b : by sorry
     ...               = 2*b : by linarith, 
 apply closure_mul g' (proper_action_set α (set_closed_ball s (2 * b))) g'_mem_closure g,
 apply intS c b cpos (le_of_lt bpos) s g' g (f L') (f L) hg' _ smalldistimg,
@@ -264,9 +271,32 @@ lemma proper_action_set_bound (b : ℝ) [pseudo_metric_space β] [isom_action α
   linarith,
   end
 
+lemma word_metric_bound_of_quasigeodesic (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
+  (L : ℝ) (Lnonneg : L ≥ 0) (f : ℝ → β)
+  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β] (g : α) (x : β)
+  [pseudo_metric_space α]
+  (hf : quasigeodesic L Lnonneg f x (g • x) c b) (n : ℕ)
+  (hL : (n:ℝ)*(b/c) ≤ L ∧ L < ((n : ℝ)+1)*(b/c)) : 
+  dist 1 g ≤ n := sorry
+
+lemma gen_bound (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
+  (L : ℝ) (Lnonneg : L ≥ 0) (f : ℝ → β) (s : set β)
+  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β]
+  [pseudo_metric_space α] :
+  ∀ g : α, ∃ k : ℝ, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g) := 
+  begin
+  sorry
+  end
 
 
 theorem metric_svarcmilnor2 (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
   [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β)
-   : @is_QI α β (@word_metric α _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
-   sorry
+   : @is_QI α β (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
+begin
+apply QIE_with_quasidense_image_is_QI,
+use [c,b],
+split, sorry,
+split, sorry,
+split,
+
+end

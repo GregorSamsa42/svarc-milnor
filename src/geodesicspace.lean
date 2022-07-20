@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2022 Georgi Kocharyan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.txt.
+Author: Georgi Kocharyan.
+-/
 
 import .quasiisometry
 import tactic
@@ -44,11 +49,7 @@ end
 
 lemma degenerate_quasigeodesic {X : Type*} [pseudo_metric_space X] (f: ℝ → X)
  (x : X) (y: X) (c : ℝ) (b : ℝ) (hf : quasigeodesic 0 (le_refl 0) f x y c b) : x = y :=
-begin
-  have h : f 0 = x, from hf.1,
-  have g : f 0 = y, from hf.2.1,
-  apply eq.trans (h.symm) g,
-end
+ eq.trans (hf.1.symm) hf.2.1
 
 
 definition fpi (L : ℝ) (Lpos : L ≥ 0) (f: ((set.Icc) (0 : ℝ) L) → X) : Π (a : ℝ),(a ≥ 0 ∧ a ≤ L) → X :=

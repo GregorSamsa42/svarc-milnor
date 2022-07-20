@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2022 Georgi Kocharyan. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.txt.
+Author: Georgi Kocharyan.
+-/
+
 import group_theory.subgroup.basic
 import tactic
 import data.real.basic 
@@ -39,12 +45,17 @@ end
 theorem cayley_preconnected (G: Type*) [group G] (S : set G)
  (hS : G = subgroup.closure S) : (cayley_graph G S hS).preconnected :=
 begin
-intros x y,
+intros x y, 
 sorry,
 end
 
+theorem cayley_connected (G: Type*) [group G] [inhabited G] (S : set G)
+ (hS : G = subgroup.closure S) : (cayley_graph G S hS).connected :=
+begin
+sorry,
+end
 
-noncomputable instance word_metric {G: Type*} [group G] (S : set G)
+noncomputable instance word_metric {G: Type*} [group G] [inhabited G] (S : set G)
  (hS : G = subgroup.closure S) : pseudo_metric_space G :=
 {
   to_has_dist := ⟨ λ g h : G, cayley_dist S hS g h ⟩,
@@ -68,11 +79,33 @@ simp,
 unfold cayley_dist,
 intros x y z,
 -- simp [coe, lift_t], 
--- apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS),
-sorry
+norm_cast,
+apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS) (cayley_connected G S hS) x y z,
 end
 }
 
+lemma adj_cayley {G: Type*} [group G] [pseudo_metric_space G] (S : set G) (hS : G = subgroup.closure S)
+  (g : G) (h : G) :
+dist g h = 1 ↔ ∃ (s ∈ S), h*s = g :=
+begin
+split,
+intro d,
+sorry,
+end
+
+lemma dist_of_mul {G: Type*} [group G] [pseudo_metric_space G] (S : set G) (hS : G = subgroup.closure S)
+  (g : G) (h : G) (a : G) : dist g h = dist (a*g)(a*h) :=
+  sorry
+
+lemma dist_of_inv {G: Type*} [group G] [pseudo_metric_space G] (S : set G) (hS : G = subgroup.closure S)
+  (g : G) (h : G) : dist g h = dist 1 (g⁻¹*h) :=
+  sorry
+
+lemma trunc_path {G: Type*} [group G] [pseudo_metric_space G] (S : set G) (hS : G = subgroup.closure S) (g : G) :
+∃ (h : G) (s ∈ S), h*s = g ∧ dist 1 h = (dist 1 g) - 1 :=
+begin
+sorry,
+end
 
 
 
