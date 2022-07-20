@@ -280,23 +280,43 @@ lemma word_metric_bound_of_quasigeodesic (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos
   dist 1 g ≤ n := sorry
 
 lemma gen_bound (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
-  (L : ℝ) (Lnonneg : L ≥ 0) (f : ℝ → β) (s : set β)
+  (s : set β)
   [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β]
   [pseudo_metric_space α] :
-  ∀ g : α, ∃ k : ℝ, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g) := 
+  ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g) := 
   begin
   sorry
   end
 
+variables (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
+  [isom_action α β]
+  (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
 
-theorem metric_svarcmilnor2 (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β)
+noncomputable instance cayley_metric : pseudo_metric_space α := 
+@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)
+
+theorem metric_svarcmilnor2 [pseudo_metric_space α] (x : β) (xs : x ∈ s)
    : @is_QI α β (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
 begin
+
 apply QIE_with_quasidense_image_is_QI,
-use [c,b],
-split, sorry,
-split, sorry,
-split,
+have hk : ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g), from gen_bound c b cpos bpos s,
+rcases hk with ⟨k, ⟨kpos, hk⟩⟩,
+apply QIE_from_different_constants _ k 1 ((c^2)/b) (b + (b/(c^2))) kpos zero_lt_one,
+apply div_pos (sq_pos_of_pos cpos) bpos,
+apply add_pos bpos (div_pos bpos (sq_pos_of_pos cpos)),
+intros g h,
+simp,
+have coverx : ∃ a : α, x ∈ isom_img a s,
+begin
+rw ← set.mem_Union, exact htrans x,
+end,
+rcases coverx with ⟨a, ⟨z, ⟨zs, hz⟩⟩⟩,
+dsimp at hz,
+rw ← hz,
+rw dist_of_inv_isom,
+repeat {rw smul_smul,},
+
+-- rw dist_of_inv (@proper_action_set α β _ _ _ (set_closed_ball  s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam) g h,
 
 end

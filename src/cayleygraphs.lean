@@ -84,6 +84,8 @@ apply @simple_graph.connected.dist_triangle _ (cayley_graph G S hS) (cayley_conn
 end
 }
 
+-- def cay : pseudo_metric_space G := word_metric S hS
+
 lemma adj_cayley {G: Type*} [group G] [pseudo_metric_space G] (S : set G) (hS : G = subgroup.closure S)
   (g : G) (h : G) :
 dist g h = 1 ↔ ∃ (s ∈ S), h*s = g :=
