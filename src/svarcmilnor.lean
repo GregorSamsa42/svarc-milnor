@@ -39,7 +39,6 @@ begin
 end
 
 variables {α : Type*} {β : Type*} [inhabited β] [group α] [inhabited α]
--- L/nat.ceil(L/d)
 
 
 lemma intS  (c : ℝ) (b : ℝ) (cpos: c > 0) (bnonneg: b ≥ 0)  [quasigeodesic_space β c b cpos bnonneg] 
@@ -174,8 +173,11 @@ rw qg.2.1,
 exact hy,
 end
 
-theorem metric_svarcmilnor1  (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
+-- Svarc-Milnor part 1: S generates G
+
+theorem metric_svarcmilnor1  (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
+  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β]
+  (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
    : α = subgroup.closure (proper_action_set α (set_closed_ball s (2*b))) :=
 begin
   rw generates_iff_subset,
@@ -201,28 +203,20 @@ begin
   use g • x,
   exact ⟨isom_img_self g s xs, qif⟩,
 
--- -- tlist is subdivision of [O,L] with distances smaller than b/c
-
--- have tplist : ∃ l : list ℝ, l.head = 0 ∧ (l.reverse).head = L ∧ (∀ i : ℕ, (l.inth i)-(l.inth (i-1)) ≤ b/c ∧  l.inth i ≥ 0 ∧ l.inth i ≤ L),
---   { apply subdiv Lpos (div_pos bpos cpos), },
--- rcases tplist with ⟨tlist, ⟨h1, ⟨h2,h3 ⟩⟩⟩,
--- have listint : ∀ r : ℝ, r ∈ tlist → (r ≥ 0 ∧ r ≤ L),
---   {sorry,},
-
--- -- xlist is images of tlist under quasigeodesic
-
--- let xlist := list.pmap (fpi L Lpos f) tlist listint,
-
--- -- glist are group elements so that g.s contains x
-
--- let glist := list.map (cover_element htrans) xlist,
-
 end
+
+
+variables (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0) 
+
+
 
 open metric 
 
-lemma svarcmilnor_qdense (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β] (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β) (xs : x ∈ s)
+-- auxiliary lemmas about metric spaces
+
+lemma svarcmilnor_qdense 
+  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β]
+  (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s) (x : β) (xs : x ∈ s)
    : has_quasidense_image (λ g : α, g • x) :=
 begin
   cases finitediam with k hk,
@@ -243,7 +237,8 @@ begin
   linarith,
 end
 
-lemma proper_action_set_bound (b : ℝ) [pseudo_metric_space β] [isom_action α β] (s : set β) (finitediam : metric.bounded s)
+lemma proper_action_set_bound (b : ℝ) [pseudo_metric_space β] [isom_action α β]
+  (s : set β) (finitediam : metric.bounded s)
   (x : β) (xs : x ∈ s)
   : ∃ k : ℝ, ∀ t ∈ proper_action_set α (set_closed_ball s (2*b)), dist x (t • x) ≤ k :=
   begin
@@ -271,36 +266,45 @@ lemma proper_action_set_bound (b : ℝ) [pseudo_metric_space β] [isom_action α
   linarith,
   end
 
-lemma word_metric_bound_of_quasigeodesic (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
+variables (s : set β) [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
+  [isom_action α β]
+  (htrans: @translates_cover α β _ _ _ s) (finitediam : metric.bounded s)
+
+-- auxiliary lemmas about word metric
+
+lemma word_metric_bound_of_quasigeodesic
   (L : ℝ) (Lnonneg : L ≥ 0) (f : ℝ → β)
-  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β] (g : α) (x : β)
-  [pseudo_metric_space α]
+  (g : α) (x : β)
   (hf : quasigeodesic L Lnonneg f x (g • x) c b) (n : ℕ)
   (hL : (n:ℝ)*(b/c) ≤ L ∧ L < ((n : ℝ)+1)*(b/c)) : 
-  dist 1 g ≤ n := sorry
+  ((@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) 
+  (metric_svarcmilnor1 c b cpos bpos s htrans finitediam))).dist 1 g ≤ n := sorry
 
-lemma gen_bound (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)
-  (s : set β)
-  [quasigeodesic_space β c b cpos (le_of_lt bpos)] [isom_action α β]
-  [pseudo_metric_space α] :
-  ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g) := 
-  begin
+variables (g : α)
+
+#check (((@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b)))
+ (metric_svarcmilnor1 c b cpos bpos s htrans finitediam))).dist) g g
+
+lemma gen_bound 
+  :
+  ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ 
+  k * (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b)))
+   (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)).dist 1 g := 
   sorry
-  end
 
-variables (c : ℝ) (b : ℝ) (cpos: c > 0) (bpos: b > 0)  [quasigeodesic_space β c b cpos (le_of_lt bpos)] 
-  [isom_action α β]
-  (s : set β) (htrans: translates_cover α s) (finitediam : metric.bounded s)
 
-noncomputable instance cayley_metric : pseudo_metric_space α := 
-@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)
+-- notation `cayleydist` := word_metric
+--(@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)).dist
 
-theorem metric_svarcmilnor2 [pseudo_metric_space α] (x : β) (xs : x ∈ s)
-   : @is_QI α β (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
+theorem metric_svarcmilnor2 
+  (x : β) (xs : x ∈ s)   
+   : @is_QI α β (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b)))
+    (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)) _ (λ g : α, g • x) :=
 begin
-
+let cayleydist := (@word_metric α _ _ (@proper_action_set α β _ _ _ (set_closed_ball s (2*b))) 
+  (metric_svarcmilnor1 c b cpos bpos s htrans finitediam)).dist,
 apply QIE_with_quasidense_image_is_QI,
-have hk : ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ k * (dist 1 g), from gen_bound c b cpos bpos s,
+have hk : ∃ k > 0, ∀ g : α, ∀ x ∈ s, dist x (g • x) ≤ k * (cayleydist 1 g), from gen_bound c b cpos bpos s htrans finitediam,
 rcases hk with ⟨k, ⟨kpos, hk⟩⟩,
 apply QIE_from_different_constants _ k 1 ((c^2)/b) (b + (b/(c^2))) kpos zero_lt_one,
 apply div_pos (sq_pos_of_pos cpos) bpos,
@@ -317,6 +321,6 @@ rw ← hz,
 rw dist_of_inv_isom,
 repeat {rw smul_smul,},
 
--- rw dist_of_inv (@proper_action_set α β _ _ _ (set_closed_ball  s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam) g h,
+rw dist_of_inv (@proper_action_set α β _ _ _ (set_closed_ball  s (2*b))) (metric_svarcmilnor1 c b cpos bpos s htrans finitediam) g h,
 
 end

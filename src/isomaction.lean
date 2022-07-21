@@ -168,6 +168,7 @@ begin
   calc
     dist x y ≤ dist x a + dist a y  : dist_triangle x a y
     ...      ≤ dist x a + dist a b + dist b y : begin rw add_assoc, apply add_le_add (le_refl (dist x a)) (dist_triangle a b y), end
+    ...      = dist x a + dist b y + dist a b : by rw add_comm (dist a b) (dist b y)
     ...      ≤ ε + ε + dist a b : by sorry
     ...      ≤ 2*ε + diam B : by sorry
 end
