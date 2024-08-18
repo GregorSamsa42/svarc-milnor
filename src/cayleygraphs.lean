@@ -90,10 +90,6 @@ noncomputable instance has_word_dist (S : set G)
 
 variables (g: G)
 
--- def cay : pseudo_metric_space G := word_metric S hS
-#check (word_metric S hS).dist g g
-#check word_metric 
-#check @dist
 
 lemma adj_cayley {G: Type*} [group G]
   (g : G) (h : G) :

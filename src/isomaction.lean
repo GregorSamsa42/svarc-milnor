@@ -67,11 +67,11 @@ exact zs,
 end
 
 theorem isom_img_self {α : Type*} {β : Type*} [group α] [pseudo_metric_space β] 
-[isom_action α β] (g : α) (s : set β) {x : β} (hx : x ∈ s) : g • x ∈ isom_img g s :=
+[isom_action α β] (g : α) (s : set β) {x : β} (xs : x ∈ s) : g • x ∈ isom_img g s :=
 begin
 use x,
 split,
-exact hx,
+exact xs,
 simp,
 end
 
@@ -168,9 +168,10 @@ begin
   calc
     dist x y ≤ dist x a + dist a y  : dist_triangle x a y
     ...      ≤ dist x a + dist a b + dist b y : begin rw add_assoc, apply add_le_add (le_refl (dist x a)) (dist_triangle a b y), end
-    ...      = dist x a + dist b y + dist a b : by rw add_comm (dist a b) (dist b y)
-    ...      ≤ ε + ε + dist a b : by sorry
-    ...      ≤ 2*ε + diam B : by sorry
+    ...      = dist x a + dist b y + dist a b : by linarith
+    ...      = dist x a + dist y b + dist a b : by rw dist_comm b y
+    ...      ≤  2*ε + dist a b : by linarith
+    ...      ≤ 2*ε + diam B : by sorry -- apply add_le_add_left (metric.dist_le_diam_of_mem' _ ha1 hb1 a b)
 end
 
 
